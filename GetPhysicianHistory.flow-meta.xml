@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <description>Retrieves past visit history for a physician before a meeting</description>
+    <interviewLabel>Get Physician History {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Get Physician History</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+    <variables>
+        <name>DoctorName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Name of the physician to look up</description>
+    </variables>
+    <variables>
+        <name>HistorySummary</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <description>Summary of physician visit history</description>
+    </variables>
+    <variables>
+        <name>PastVisits</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ServiceAppointment</objectType>
+    </variables>
+    <variables>
+        <name>VisitCount</name>
+        <dataType>Number</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <scale>0</scale>
+        <value><numberValue>0.0</numberValue></value>
+    </variables>
+    <recordLookups>
+        <name>GetPastVisits</name>
+        <label>Get Past Visits</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>CountVisits</targetReference>
+        </connector>
+        <filterLogic>1</filterLogic>
+        <filters>
+            <field>Subject</field>
+            <operator>Contains</operator>
+            <value><elementReference>DoctorName</elementReference></value>
+        </filters>
+        <object>ServiceAppointment</object>
+        <outputReference>PastVisits</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Subject</queriedFields>
+        <queriedFields>Status</queriedFields>
+        <queriedFields>Description</queriedFields>
+        <queriedFields>SchedStartTime</queriedFields>
+        <sortField>SchedStartTime</sortField>
+        <sortOrder>Desc</sortOrder>
+        <limit>5</limit>
+    </recordLookups>
+    <assignments>
+        <name>CountVisits</name>
+        <label>Count Visits</label>
+        <locationX>176</locationX>
+        <locationY>254</locationY>
+        <assignmentItems>
+            <assignToReference>VisitCount</assignToReference>
+            <operator>AssignCount</operator>
+            <value><elementReference>PastVisits</elementReference></value>
+        </assignmentItems>
+        <connector>
+            <targetReference>SetSummary</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>SetSummary</name>
+        <label>Set History Summary</label>
+        <locationX>176</locationX>
+        <locationY>374</locationY>
+        <assignmentItems>
+            <assignToReference>HistorySummary</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Found {!VisitCount} past visit(s) for {!DoctorName}. Latest records retrieved. Use this context to prepare for your upcoming meeting.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>GetPastVisits</targetReference>
+        </connector>
+    </start>
+</Flow>

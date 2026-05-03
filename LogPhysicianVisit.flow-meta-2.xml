@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <description>Logs a physician visit by creating a Service Appointment record with visit notes</description>
+    <interviewLabel>Log Physician Visit {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Log Physician Visit</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+    <variables>
+        <name>DoctorName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Name of the physician visited</description>
+    </variables>
+    <variables>
+        <name>ClinicName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Name of the clinic or hospital visited</description>
+    </variables>
+    <variables>
+        <name>VisitNotes</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Summary notes from the physician visit</description>
+    </variables>
+    <variables>
+        <name>FollowUpRequired</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <value><booleanValue>false</booleanValue></value>
+        <description>Whether a follow-up is required</description>
+    </variables>
+    <variables>
+        <name>AppointmentId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <description>ID of created appointment record</description>
+    </variables>
+    <variables>
+        <name>ConfirmationMessage</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <description>Confirmation message to return to agent</description>
+    </variables>
+    <recordCreates>
+        <name>CreateVisitRecord</name>
+        <label>Create Visit Record</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignRecordIdToReference>AppointmentId</assignRecordIdToReference>
+        <connector>
+            <targetReference>SetConfirmation</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>ParentRecordId</field>
+            <value><stringValue>001bm000021ZglxAAC</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <elementReference>DoctorName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value><stringValue>Completed</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>VisitNotes</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>SchedStartTime</field>
+            <value><elementReference>$Flow.CurrentDateTime</elementReference></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>SchedEndTime</field>
+            <value><elementReference>$Flow.CurrentDateTime</elementReference></value>
+        </inputAssignments>
+        <object>ServiceAppointment</object>
+    </recordCreates>
+    <assignments>
+        <name>SetConfirmation</name>
+        <label>Set Confirmation Message</label>
+        <locationX>176</locationX>
+        <locationY>254</locationY>
+        <assignmentItems>
+            <assignToReference>ConfirmationMessage</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Visit logged successfully! Doctor: {!DoctorName}, Clinic: {!ClinicName}. Record ID: {!AppointmentId}</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>CreateVisitRecord</targetReference>
+        </connector>
+    </start>
+</Flow>

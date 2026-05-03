@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <description>Creates a follow-up task after a physician visit</description>
+    <interviewLabel>Create Follow Up Task {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create Follow Up Task</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value><stringValue>LightningFlowBuilder</stringValue></value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+    <variables>
+        <name>DoctorName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Name of the physician for follow-up</description>
+    </variables>
+    <variables>
+        <name>FollowUpNotes</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>Notes about what follow-up is needed</description>
+    </variables>
+    <variables>
+        <name>DueDateText</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <description>When the follow-up is due (e.g. next week)</description>
+    </variables>
+    <variables>
+        <name>TaskId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <name>ConfirmationMessage</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <recordCreates>
+        <name>CreateTask</name>
+        <label>Create Follow Up Task</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignRecordIdToReference>TaskId</assignRecordIdToReference>
+        <connector>
+            <targetReference>SetConfirmation</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Subject</field>
+            <value><stringValue>Follow-up: {!DoctorName}</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value><elementReference>FollowUpNotes</elementReference></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value><stringValue>Not Started</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value><stringValue>Normal</stringValue></value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value><elementReference>$Flow.CurrentDate</elementReference></value>
+        </inputAssignments>
+        <object>Task</object>
+    </recordCreates>
+    <assignments>
+        <name>SetConfirmation</name>
+        <label>Set Confirmation</label>
+        <locationX>176</locationX>
+        <locationY>254</locationY>
+        <assignmentItems>
+            <assignToReference>ConfirmationMessage</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Follow-up task created for Dr. {!DoctorName}! Notes: {!FollowUpNotes}. Task ID: {!TaskId}</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>CreateTask</targetReference>
+        </connector>
+    </start>
+</Flow>
